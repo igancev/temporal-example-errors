@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Temporal\Samples\FailedExample;
+namespace Temporal\Samples\FailedExample\Dto;
 
 final readonly class WorkDto
 {

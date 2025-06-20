@@ -1,16 +1,29 @@
 <?php
 
-namespace Temporal\Samples\FailedExample;
+namespace Temporal\Samples\FailedExample\Activity;
 
 use Ramsey\Uuid\Rfc4122\UuidV7;
 use Temporal\Activity\ActivityInterface;
 use Temporal\Activity\ActivityMethod;
+use Temporal\Samples\FailedExample\Dto\Id;
+use Temporal\Samples\FailedExample\Dto\WorkDto;
+use Temporal\Samples\FailedExample\Dto\WorkType;
+use Temporal\Samples\FailedExample\Workflow\ChildGrayWorkflow;
+use Temporal\Samples\FailedExample\Workflow\ChildWhiteWorkflow;
 
-#[ActivityInterface(prefix: 'SleepActivity.')]
+#[ActivityInterface(prefix: 'RegularActivity.')]
 class RegularActivity
 {
     #[ActivityMethod(name: "Sleep")]
     public function sleep(int $delayMilliseconds): int
+    {
+        usleep(microseconds: $delayMilliseconds * 1000);
+
+        return $delayMilliseconds;
+    }
+
+    #[ActivityMethod(name: "BeforeWait")]
+    public function beforeWait(string $any, int $delayMilliseconds): int
     {
         usleep(microseconds: $delayMilliseconds * 1000);
 

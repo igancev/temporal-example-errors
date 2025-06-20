@@ -10,6 +10,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Temporal\Client\WorkflowOptions;
 use Temporal\Exception\Client\WorkflowNotFoundException;
+use Temporal\Samples\FailedExample\Dto\Id;
+use Temporal\Samples\FailedExample\Dto\WorkDto;
+use Temporal\Samples\FailedExample\Dto\WorkType;
+use Temporal\Samples\FailedExample\Workflow\ChildGrayWorkflow;
+use Temporal\Samples\FailedExample\Workflow\ChildWhiteWorkflow;
+use Temporal\Samples\FailedExample\Workflow\ParentWorkflow;
 use Temporal\SampleUtils\Command;
 
 class ExecuteCommand extends Command
@@ -20,6 +26,11 @@ class ExecuteCommand extends Command
     protected const array ARGUMENTS = [
         ['countOfWorkflows', InputArgument::REQUIRED, 'Count of workflows'],
     ];
+
+    /**
+     * @var list<string, true>
+     */
+    private array $sentSignals = [];
 
     public function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -63,14 +74,13 @@ class ExecuteCommand extends Command
             pageSize: 50,
         );
 
-        $sentSignals = [];
         do {
             $output->writeln('Page: '. $paginator->getPageNumber());
 
             foreach ($paginator as $key => $workflowExecutionInfo) {
                 $runningWorkflowId = $workflowExecutionInfo->execution->getID();
 
-                if (array_key_exists($runningWorkflowId, $sentSignals)) {
+                if (array_key_exists($runningWorkflowId, $this->sentSignals)) {
                     $output->writeln('Signal have been already sent in Workflow ' . $runningWorkflowId);
                     continue;
                 }
@@ -85,7 +95,7 @@ class ExecuteCommand extends Command
                 // send signal
                 try {
                     $workflow->sendSignalToContinue();
-                    $sentSignals[$runningWorkflowId] = true;
+                    $this->sentSignals[$runningWorkflowId] = true;
                     $output->writeln($key . '. Sent signal to ' . $runningWorkflowId);
                 } catch (WorkflowNotFoundException $e) {
                     $output->writeln($e->getPrevious()->getMessage() . ': ' . $runningWorkflowId);

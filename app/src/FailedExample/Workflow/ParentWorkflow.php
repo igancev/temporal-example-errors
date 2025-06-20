@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Temporal\Samples\FailedExample;
+namespace Temporal\Samples\FailedExample\Workflow;
 
 use Carbon\CarbonInterval;
 use Generator;
@@ -11,6 +11,9 @@ use Temporal\Activity\ActivityOptions;
 use Temporal\Activity\LocalActivityOptions;
 use Temporal\DataConverter\Type;
 use Temporal\Internal\Workflow\ActivityProxy;
+use Temporal\Samples\FailedExample\Activity\LocalActivity;
+use Temporal\Samples\FailedExample\Activity\RegularActivity;
+use Temporal\Samples\FailedExample\Dto\WorkDto;
 use Temporal\Workflow;
 use Temporal\Workflow\ReturnType;
 use Temporal\Workflow\WorkflowInterface;

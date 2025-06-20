@@ -1,6 +1,6 @@
 <?php
 
-namespace Temporal\Samples\FailedExample;
+namespace Temporal\Samples\FailedExample\Activity;
 
 use Temporal\Activity\ActivityMethod;
 use Temporal\Activity\LocalActivityInterface;

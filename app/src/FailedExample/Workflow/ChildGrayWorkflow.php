@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Temporal\Samples\FailedExample;
+namespace Temporal\Samples\FailedExample\Workflow;
 
 use Carbon\CarbonInterval;
 use Temporal\Activity\ActivityOptions;
 use Temporal\DataConverter\Type;
 use Temporal\Internal\Workflow\ActivityProxy;
+use Temporal\Samples\FailedExample\Activity\RegularActivity;
+use Temporal\Samples\FailedExample\Dto\Id;
+use Temporal\Samples\FailedExample\Dto\WorkType;
 use Temporal\Workflow;
 use Temporal\Workflow\ReturnType;
 use Temporal\Workflow\WorkflowInterface;
@@ -42,7 +45,7 @@ class ChildGrayWorkflow
         $sleepTimeInMs = yield $this->regularActivity->sleep($delayMs);
 
         if ($sleepTimeInMs > 300) {
-            yield $this->regularActivity->sleep($delayMs);
+            yield $this->regularActivity->beforeWait('gray', $delayMs);
             yield Workflow::await(fn() => $this->signalReceived);
         }
 
@@ -50,6 +53,7 @@ class ChildGrayWorkflow
             'Hello from ChildGrayWorkflow! Delay was ',
             $delayMs,
             ' milliseconds.',
+            ' Signal was received: ' . $this->signalReceived ? 'yes' : 'no',
         ];
     }
 
