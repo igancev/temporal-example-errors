@@ -38,8 +38,12 @@ class ExecuteCommand extends Command
 
         $this->runManyWorkflows($countOfWorkflows);
 
-        while (true) {
-            $this->sendSignals($output);
+        $count = 0;
+        start:
+        $d = $this->sendSignals($output);
+        $count += $d;
+        if ($count < $countOfWorkflows || $d > 0) {
+            goto start;
         }
 
         return self::SUCCESS;
@@ -67,13 +71,14 @@ class ExecuteCommand extends Command
         }
     }
 
-    private function sendSignals(OutputInterface $output): void
+    private function sendSignals(OutputInterface $output): int
     {
         $paginator = $this->workflowClient->listWorkflowExecutions(
             '`ExecutionStatus`="Running" AND `WorkflowType`!="Parent.DoSomething"', // all children
             pageSize: 50,
         );
 
+        $count = 0;
         do {
             $output->writeln('Page: '. $paginator->getPageNumber());
 
@@ -85,6 +90,7 @@ class ExecuteCommand extends Command
                     continue;
                 }
 
+                ++$count;
                 /** @var ChildWhiteWorkflow|ChildGrayWorkflow $workflow */
                 $workflow = $this->workflowClient->newRunningWorkflowStub(
                     $workflowExecutionInfo->type->name === 'ChildGrayWorkflow.DoAnything'
@@ -106,5 +112,7 @@ class ExecuteCommand extends Command
                 }
             }
         } while ($paginator = $paginator->getNextPage());
+
+        return $count;
     }
 }

@@ -19,6 +19,8 @@ use Temporal\WorkerFactory;
 ini_set('display_errors', 'stderr');
 include "vendor/autoload.php";
 
+error_reporting(E_ALL & ~E_DEPRECATED);
+
 //FeatureFlags::$workflowDeferredHandlerStart = true;
 
 // finds all available workflows, activity types and commands in a given directory
@@ -31,10 +33,13 @@ $factory = WorkerFactory::create();
 $tracer = TracerFactory::create('interceptors-sample-worker');
 
 // Worker that listens on a task queue and hosts both workflow and activity implementations.
-$worker = $factory->newWorker(interceptorProvider: new SimplePipelineProvider([
-    new OpenTelemetryActivityInboundInterceptor($tracer),
-    new OpenTelemetryWorkflowOutboundRequestInterceptor($tracer)
-]));
+$worker = $factory->newWorker(
+    options: \Temporal\Worker\WorkerOptions::new()->withMaxConcurrentWorkflowTaskExecutionSize(100),
+    interceptorProvider: new SimplePipelineProvider([
+        new OpenTelemetryActivityInboundInterceptor($tracer),
+        new OpenTelemetryWorkflowOutboundRequestInterceptor($tracer)
+    ])
+);
 
 foreach ($declarations->getWorkflowTypes() as $workflowType) {
     // Workflows are stateful. So you need a type to create instances.
