@@ -60,6 +60,10 @@ near 5% in average of all executions is **failed** or **suspended** in broken st
 
 ![screenshot_after_load_test_1.png](resources/screenshot_after_load_test_1.png)
 
+## Screen recording video of script launching
+
+[Link](https://www.dropbox.com/scl/fi/wrjg95j88f2ktexdwha7w/demonstrate-temporal-errors-2025-07-02_11.07.52.mp4?rlkey=pkj58ql56pfdphl26h9cdr3bn&e=1&st=rz8k5l2x&dl=0)
+
 ## Examples of several workflow executions in "Failed" status:
 
 1. [c7d3aadd-206b-4967-8f7e-de992b1fe72c_events.json](./resources/c7d3aadd-206b-4967-8f7e-de992b1fe72c_events.json)
